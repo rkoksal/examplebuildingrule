@@ -1,0 +1,249 @@
+/**
+ * File:    Villa.cga
+ * Created: 3 Mar 2020 11:04:22 GMT
+ * Author:  Recep
+ */
+
+version "2019.0"
+
+import Plant : "/ESRI.lib/rules/Plants/Plant_Loader.cga" (Name="",Height=1,Radius=1,Reporting="None",Representation=Agac_Tipi,RandomRotation=true,RandomBrightness=false,RandomHeights="Mature and young") # switches off the attributes in the  Inspector
+
+
+attr Doku = "Ahsap/WoodSiding01_col.jpg"
+attr NormalMap = "Ahsap/WoodSiding01_nrm.jpg"
+attr Metalic = "Ahsap/WoodSiding01_met.jpg"
+attr duvar_yuksekligi = rand(5,20)
+attr Ambient = "Ahsap/WoodSiding01_AO.jpg"
+attr Roughness = "Ahsap/WoodSiding01_rgh.jpg"
+
+attr Agac_Yogunlugu = 5
+@Group("Agac",3)
+@Order(1) @Range("None","Fan","Model","Analytical") @Description("Do not generate Models for whole city i.e. take care with polygon counts!")
+attr Agac_Tipi		= "Fan"
+
+Lot-->
+Tabanalani
+Tabanalani-->
+extrude(0.1)
+	comp(f){ side : facades | top: binabasliyor} 
+binabasliyor-->
+	
+	split(x){~0.50 : Bahceeksi | ~4 : bolum1 | ~4 : bolum2  | ~5 : anabina |  2 : Garaj|  ~0.40 : Bahce}
+	
+Bahceeksi--> split(y){1:bahce | ~2: giris | ~10 : bahce}
+
+
+
+anabina-->
+split(y){ ~3:bahce | ~10: bina1 | ~6 : kulube}
+extrude (5)
+bina1-->
+extrude (14)
+
+comp(f){front : Onceohebina1 | left : SolCephebina1 | right : SagCepheBina1| back: ArkaCepheBina1 | top : CatiBina1}
+bolum2-->
+split(y){ ~9:bahce | ~10: bina2 | ~6 : bahce}
+bina2-->
+extrude(10)
+comp(f){front : Onceohebina2 | left : duvar | right : SagCepheBina2| back: ArkaCepheBina2 | top : CatiBina2}
+Onceohebina2-->
+split(x){4: KapiBoslugu |  ~4 : pencereboslugubina2 | ~2 : BinaDuvari }
+
+KapiBoslugu-->
+split(y){3 : Kapi | ~1 : duvar }
+
+kulube-->
+split(x){ ~9:bahce | ~10: kulubeyeri | ~6 : bahce}
+kulubeyeri-->
+split(y){  ~10: kulubekendisi | ~8 : bahce}
+
+kulubekendisi-->
+extrude(15)
+comp(f) {back : kulubearkacephe | right : kulubesagcephe | left : kulubesolcephe | top : kulubecati}
+ArkaCepheBina2-->
+split(y) {1 :  BinaDuvari | 1 : pencereboslugu2 | ~0.10 : duvar}*
+kulubesagcephe-->
+split(x){4: KapiBoslugu |  ~4 : pencereboslugubina2 | ~2 : BinaDuvari }
+
+kulubearkacephe-->
+split(x){4: KapiBoslugu |  ~4 : pencereboslugubina2 | ~2 : BinaDuvari }
+
+kulubesolcephe-->
+split(x){4: KapiBoslugu |  ~4 : pencereboslugubina2 | ~2 : BinaDuvari }
+bolum1-->
+
+split(y){ ~4 : bahce | ~5: garaj| ~2 : bahce}   
+garaj-->
+extrude (4)
+comp(f){front : OncepheGaraj | left : garajcepheler | right : garajsagcephe | back: duvar  |  top : CatiGaraj}
+Onceohebina1-->
+split(x){~1: BinaDuvari |  ~3 : pencereboslugu | ~1 : BinaDuvari }*
+pencereboslugu-->
+split(y) {~1 :  BinaDuvari | 2 : pencere | 0.10 : duvar}*
+pencereboslugubina2-->
+split(y) {~1 :  BinaDuvari | 1 : pencereboslugu2 | 0.10 : duvar}*
+pencere-->
+i("Pencereler/Ahsappencere.dae")
+t(0,0,-0.3)
+SolCephebina1-->
+split(x) {~27 : Bosluk | ~14 : Pencerlialain}
+
+Pencerlialain-->
+split(x){~1: BinaDuvari |  ~3 : pencereboslugu | ~1 : BinaDuvari }*
+
+Bosluk-->
+	split(y)
+	{~15 : duvar |~2 : tuvaletpencereleri }
+	
+tuvaletpencereleri-->
+
+split(x)
+	{~4 : duvar |~2 : tpencere }*
+tpencere-->
+i("Pencereler/pimapenpencere.dae")
+	s('1,'1,0.04)
+	
+OncepheGaraj-->
+	split(x) {1:duvar | ~4 :  garajkapisi | ~1 :duvar}
+	
+garajkapisi-->
+	i("builtin:cube")
+	s('1,'1,0.1)
+	r(120,0,0)
+	t(0,-2.78,-2.78)
+	setupProjection(0,scope.xy,2,2)
+texture("/EGM/assets/Duvar/duvar.jpg")projectUV(0)
+garajcepheler-->
+
+split(x){~5 :duvar | ~2 :Pencereyeri | ~5 :duvar }
+
+Pencereyeri-->
+split(y){~1.20 :duvar | ~1 : garajpencere | ~1 :duvar }*
+
+
+SagCepheBina1-->
+split(x){~1: BinaDuvari |  ~3 : pencereboslugusolcephe | ~1 : BinaDuvari }*
+
+pencereboslugusolcephe-->
+
+extrude(0.30)
+comp(f){side : pencerekenarlari | top : penceresagcephe }
+
+penceresagcephe-->
+
+split(y){1:duvarx|2: split(x){1:duvarx| ~2:b | 1 :duvarx}}*
+b-->
+split(y){~1:duvar| ~3 : yanpencere}
+
+yanpencere-->
+i("/EGM/assets/Modeller/Pencere/Pencere.dae")
+
+pervaz-->
+
+extrude(0.30)
+
+y-->
+
+extrude(0.40)
+
+ArkaCepheBina1-->
+
+split(y){~5 :pencereboslugu2 | ~9 :duvar | ~8:  pencereboslugu2}
+
+Kapi-->
+
+split(x) {~1:duvar | 2 : Kapininkendisi | ~2: duvar}
+
+Kapininkendisi-->
+
+i("Kapilar/kapi/kapi.dae")
+t('0,'0,-0.8)
+
+CatiBina1-->
+extrude(4)
+comp(f){side : facades | top: yenicati}
+yenicati-->
+roofGable(15,2)
+setupProjection(0,scope.xz,4,4)
+texture("/sci-fi istanbul/models/rooftile.color_1.7.jpg")projectUV(0)
+facades-->
+split(x){~5 :pencereboslugu2 | ~9 :duvar | ~8:  pencereboslugu2}
+
+CatiBina2-->
+extrude(2)
+comp(f){side : facades | top: bina2cati}
+bina2cati-->
+
+split(y) {0.10: boss | ~17 : boss | 3 : duvar }
+boss-->
+split(x){~10:catialani | ~5: duvar}
+catialani-->
+extrude(3)
+comp(f) { left : duvar | front : pencereboslugu2 |  right : kulubesagcephe| top : bina2catisi | back : duvar}
+
+bina2catisi-->
+
+roofShed(10,3) egikq
+egik--> comp(f) {all : X}
+
+CatiGaraj-->
+
+roofPyramid(10)
+
+setupProjection(0,scope.zx,2,2)
+	 texture("/EGM/assets/roofs/chimneyTex_v7.png")projectUV(0)
+
+	getTree = listRandom("Bay Laurel;California Incense Cedar;Desert Willow;Ficus;Flannelbush;Hedgehog Agave;Lacy Tree Philodendron;Leyland Cypress;Mediterranean Buckthorn;Orange Tree;Oval-leaved Privet;Palm Lily;Palo Verde;Red Alder;Rhododendron Azaleas;Rose;Saguaro Cactus;Spanish Broom;Sweetgum;Umbrella Acacia;White Poplar;")
+
+bahce-->
+
+	case Agac_Tipi == "None":
+		NIL
+	else:
+		set(Plant.Representation,Agac_Tipi)
+		Plant.Generate(getTree)
+		
+pencereboslugu2-->
+
+i("Pencereler/uzunpencere.dae")
+s('1,'1,0.01)
+
+BinaDuvari-->
+
+setupProjection(0, scope.xy, 5, 5)
+	set(material.colormap,Doku)
+	set(material.normalmap,NormalMap)
+	set(material.metallicmap,Metalic)
+	set(material.occlusionmap,Ambient)
+	set(material.roughnessmap,Roughness)
+	 projectUV(0)
+	
+duvar-->
+setupProjection(0, scope.xy, 5, 5)
+	set(material.colormap,Doku)
+	set(material.normalmap,NormalMap)
+	set(material.metallicmap,Metalic)
+	set(material.occlusionmap,Ambient)
+	set(material.roughnessmap,Roughness)
+	 projectUV(0)
+	 
+	 duvarx-->
+extrude(0.25)
+	 setupProjection(0, scope.xy, 5, 5)
+	set(material.colormap,Doku)
+	set(material.normalmap,NormalMap)
+	set(material.metallicmap,Metalic)
+	set(material.occlusionmap,Ambient)
+	set(material.roughnessmap,Roughness)
+	  projectUV(0)
+	  
+	 garajpencere-->
+	 i("Pencereler/uzunpencere.dae")
+	 egikq-->
+	 setupProjection(0,scope.zx,2,2)
+	 texture("/EGM/assets/roofs/chimneyTex_v7.png")projectUV(0)
+	 
+	 kulubecati-->
+	 roofShed(10,5)
+	 setupProjection(0,scope.zx,2,2)
+	 texture("/EGM/assets/roofs/chimneyTex_v7.png")projectUV(0)
